@@ -134,7 +134,7 @@ mkdir %SYMBOLS_FOLDER%
 
 echo Configuring the project
 pushd %BUILD_FOLDER%
-%QMAKE_CMD% %SOURCE_ROOT%\moonlight-qt.pro
+%QMAKE_CMD% %SOURCE_ROOT%\artemis.pro
 if !ERRORLEVEL! NEQ 0 goto Error
 popd
 

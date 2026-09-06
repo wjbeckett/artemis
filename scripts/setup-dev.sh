@@ -98,7 +98,7 @@ build_project() {
             fi
             
             echo "🔧 Running qmake..."
-            $QMAKE moonlight-qt.pro CONFIG+=debug
+            $QMAKE artemis.pro CONFIG+=debug
             
             echo "🔨 Compiling..."
             if [[ "$OS" == "macos" ]]; then
@@ -109,7 +109,7 @@ build_project() {
             ;;
         "windows")
             echo "🔧 For Windows, use Qt Creator or run from Qt Command Prompt:"
-            echo "   qmake6 moonlight-qt.pro CONFIG+=debug"
+            echo "   qmake6 artemis.pro CONFIG+=debug"
             echo "   nmake"
             ;;
     esac
@@ -151,13 +151,13 @@ show_next_steps() {
     
     case $OS in
         "linux")
-            echo "      ./app/moonlight"
+            echo "      ./app/artemis"
             ;;
         "macos")
-            echo "      open app/Moonlight.app"
+            echo "      open app/Artemis.app"
             ;;
         "windows")
-            echo "      app\\debug\\moonlight.exe"
+            echo "      app\\debug\\artemis.exe"
             ;;
     esac
     
@@ -180,8 +180,8 @@ main() {
     echo ""
     
     # Check if we're in the right directory
-    if [[ ! -f "moonlight-qt.pro" ]]; then
-        echo "❌ Error: moonlight-qt.pro not found."
+    if [[ ! -f "artemis.pro" ]]; then
+        echo "❌ Error: artemis.pro not found."
         echo "   Please run this script from the root of the Artemis Qt repository."
         exit 1
     fi
