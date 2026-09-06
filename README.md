@@ -207,7 +207,7 @@ sudo dnf install qt6-qtbase-devel qt6-qtdeclarative-devel \
 git submodule update --init --recursive
 
 # Configure and build
-qmake6 moonlight-qt.pro CONFIG+=release
+qmake6 artemis.pro CONFIG+=release
 make -j$(nproc)  # Linux
 make -j$(sysctl -n hw.ncpu)  # macOS
 nmake  # Windows
