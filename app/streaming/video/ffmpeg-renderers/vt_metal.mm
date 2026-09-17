@@ -336,7 +336,10 @@ public:
 
             switch (colorspace) {
             case COLORSPACE_REC_709:
-                m_MetalLayer.colorspace = newColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceITUR_709);
+                // Tag the Metal layer as sRGB, not ITUR_709. The fragment shader already
+                // applies Bt.709 limited/full CSC into display RGB; marking the layer as
+                // ITUR_709 caused washed-out SDR on ProMotion vs native Punktfunk.
+                m_MetalLayer.colorspace = newColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
                 m_MetalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
                 paramBuffer.cscParams = (fullRange ? k_CscParams_Bt709Full : k_CscParams_Bt709Lim);
                 break;
@@ -622,6 +625,9 @@ public:
 
                 [renderEncoder setRenderPipelineState:m_OverlayPipelineState];
                 [renderEncoder setFragmentTexture:overlayTexture atIndex:0];
+                // SDR sRGB layer makes UI glyphs look dim vs the PQ/EDR HDR path; lift them.
+                float overlayGain = (m_MetalLayer.pixelFormat == MTLPixelFormatBGR10A2Unorm) ? 1.0f : 2.25f;
+                [renderEncoder setFragmentBytes:&overlayGain length:sizeof(overlayGain) atIndex:0];
                 [renderEncoder setVertexBytes:verts length:sizeof(verts) atIndex:0];
                 [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:SDL_arraysize(verts)];
 

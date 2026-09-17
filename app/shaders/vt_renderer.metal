@@ -57,7 +57,10 @@ fragment float4 ps_draw_triplanar(Vertex v [[ stage_in ]],
 }
 
 fragment float4 ps_draw_rgb(Vertex v [[ stage_in ]],
-                            texture2d<float> rgbTexture [[ texture(0) ]])
+                            texture2d<float> rgbTexture [[ texture(0) ]],
+                            constant float &overlayGain [[ buffer(0) ]])
 {
-    return rgbTexture.sample(s, v.texCoords);
+    float4 c = rgbTexture.sample(s, v.texCoords);
+    c.rgb = min(c.rgb * overlayGain, float3(1.0f));
+    return c;
 }
