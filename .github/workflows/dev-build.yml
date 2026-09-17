@@ -180,7 +180,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-22.04]
+        # Pin macOS away from macos-latest (26/SDK 26) — Qt 6.8.3 hits QTBUG-145239
+        # (__yield in qyieldcpu.h) under that SDK.
+        os: [macos-15, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -193,7 +195,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ env.QT_VERSION }}
-          host: ${{ matrix.os == 'macos-latest' && 'mac' || 'linux' }}
+          host: ${{ matrix.os == 'macos-15' && 'mac' || 'linux' }}
           target: 'desktop'
           modules: 'qtmultimedia'
 
@@ -781,7 +783,8 @@ jobs:
   build-macos-dev:
     name: macOS Development Build
     needs: setup-version
-    runs-on: macos-latest
+    # Pin away from macos-latest (26/SDK 26) — Qt 6.8.3 hits QTBUG-145239 there.
+    runs-on: macos-15
     if: needs.setup-version.outputs.should_build == 'true'
     
     steps:

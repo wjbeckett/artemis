@@ -749,7 +749,9 @@ public:
         // If we only use 2 drawables, we'll be stuck in the composited path
         // (particularly for windowed mode) and our latency will actually be
         // higher than opting for triple buffering.
-        m_MetalLayer.maximumDrawableCount = 3;
+        m_MetalLayer.maximumDrawableCount = 2;
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                    "Using two Metal drawables to keep macOS presentation composited");
 
         // Allow tearing if V-Sync is off (also requires direct display path)
         m_MetalLayer.displaySyncEnabled = params->enableVsync;
