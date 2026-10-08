@@ -379,8 +379,12 @@ bool ClipboardManager::sendClipboardToServer(const QString &content)
     emit clipboardSyncStarted();
     m_syncInProgress = true;
 
-    // Use the new NvHTTP clipboard method
-    bool success = m_http->sendClipboardContent(content);
+    // On Linux the session's NvHTTP lives on the streaming thread, which runs no Qt
+    // event loop, while uploads are triggered from the GUI thread. A cross-thread
+    // QNetworkAccessManager never gets its sslErrors handled and the TLS handshake
+    // fails, so use a client owned by the calling thread.
+    NvHTTP http(m_computer);
+    bool success = http.sendClipboardContent(content);
     
     m_syncInProgress = false;
     
@@ -410,8 +414,9 @@ QString ClipboardManager::getClipboardFromServer()
     emit clipboardSyncStarted();
     m_syncInProgress = true;
 
-    // Use the new NvHTTP clipboard method
-    QString content = m_http->getClipboardContent();
+    // Same thread affinity issue as in sendClipboardToServer()
+    NvHTTP http(m_computer);
+    QString content = http.getClipboardContent();
     
     m_syncInProgress = false;
     
