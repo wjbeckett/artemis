@@ -44,6 +44,10 @@
 #define SER_DETECTNETBLOCKING "detectnetblocking"
 #define SER_SHOWPERFOVERLAY "showperfoverlay"
 #define SER_SWAPMOUSEBUTTONS "swapmousebuttons"
+#define SER_SWAPCMDCTRL "swapcmdctrl" // Migrate the earlier swap-only preference.
+#define SER_CONTROLMODIFIER "controlmodifier"
+#define SER_OPTIONMODIFIER "optionmodifier"
+#define SER_COMMANDMODIFIER "commandmodifier"
 #define SER_MUTEONFOCUSLOSS "muteonfocusloss"
 #define SER_BACKGROUNDGAMEPAD "backgroundgamepad"
 #define SER_REVERSESCROLL "reversescroll"
@@ -150,6 +154,19 @@ void StreamingPreferences::reload()
     showPerformanceOverlay = settings.value(SER_SHOWPERFOVERLAY, false).toBool();
     packetSize = settings.value(SER_PACKETSIZE, 0).toInt();
     swapMouseButtons = settings.value(SER_SWAPMOUSEBUTTONS, false).toBool();
+    if (settings.contains(SER_CONTROLMODIFIER) || settings.contains(SER_OPTIONMODIFIER) ||
+            settings.contains(SER_COMMANDMODIFIER)) {
+        bool controlOk, optionOk, commandOk;
+        int control = settings.value(SER_CONTROLMODIFIER, ModifierMapping::Control).toInt(&controlOk);
+        int option = settings.value(SER_OPTIONMODIFIER, ModifierMapping::Alt).toInt(&optionOk);
+        int command = settings.value(SER_COMMANDMODIFIER, ModifierMapping::Meta).toInt(&commandOk);
+        modifierMapping = controlOk && optionOk && commandOk ?
+                    ModifierMapping(control, option, command) : ModifierMapping();
+    }
+    else {
+        modifierMapping = settings.value(SER_SWAPCMDCTRL, false).toBool() ?
+                    ModifierMapping(ModifierMapping::Meta, ModifierMapping::Alt, ModifierMapping::Control) : ModifierMapping();
+    }
     muteOnFocusLoss = settings.value(SER_MUTEONFOCUSLOSS, false).toBool();
     backgroundGamepad = settings.value(SER_BACKGROUNDGAMEPAD, false).toBool();
     reverseScrollDirection = settings.value(SER_REVERSESCROLL, false).toBool();
@@ -367,6 +384,10 @@ void StreamingPreferences::save()
     settings.setValue(SER_RENDERERBACKEND, static_cast<int>(rendererBackend));
     settings.setValue(SER_DEFAULTVER, CURRENT_DEFAULT_VER);
     settings.setValue(SER_SWAPMOUSEBUTTONS, swapMouseButtons);
+    settings.setValue(SER_CONTROLMODIFIER, controlModifier());
+    settings.setValue(SER_OPTIONMODIFIER, optionModifier());
+    settings.setValue(SER_COMMANDMODIFIER, commandModifier());
+    settings.remove(SER_SWAPCMDCTRL);
     settings.setValue(SER_MUTEONFOCUSLOSS, muteOnFocusLoss);
     settings.setValue(SER_BACKGROUNDGAMEPAD, backgroundGamepad);
     settings.setValue(SER_REVERSESCROLL, reverseScrollDirection);
@@ -436,4 +457,44 @@ int StreamingPreferences::getDefaultBitrate(int width, int height, int fps, bool
     }
 
     return qRound(resolutionFactor * frameRateFactor) * 1000;
+}
+
+void StreamingPreferences::setControlModifier(int target)
+{
+    if (modifierMapping.setTarget(ModifierMapping::Control, target)) {
+        emit modifierMappingChanged();
+    }
+}
+
+void StreamingPreferences::setOptionModifier(int target)
+{
+    if (modifierMapping.setTarget(ModifierMapping::Alt, target)) {
+        emit modifierMappingChanged();
+    }
+}
+
+void StreamingPreferences::setCommandModifier(int target)
+{
+    if (modifierMapping.setTarget(ModifierMapping::Meta, target)) {
+        emit modifierMappingChanged();
+    }
+}
+
+void StreamingPreferences::setModifierPreset(int preset)
+{
+    ModifierMapping mapping;
+    if (preset == 1) {
+        mapping = ModifierMapping(ModifierMapping::Meta, ModifierMapping::Alt, ModifierMapping::Control);
+    }
+    else if (preset == 2) {
+        mapping = ModifierMapping(ModifierMapping::Control, ModifierMapping::Meta, ModifierMapping::Alt);
+    }
+    else if (preset != 0) {
+        return;
+    }
+    if (mapping.targets[0] != controlModifier() || mapping.targets[1] != optionModifier() ||
+            mapping.targets[2] != commandModifier()) {
+        modifierMapping = mapping;
+        emit modifierMappingChanged();
+    }
 }

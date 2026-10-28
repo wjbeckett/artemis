@@ -240,7 +240,9 @@ HEADERS += \
     cli/quitstream.h \
     cli/startstream.h \
     settings/streamingpreferences.h \
+    settings/modifiermapping.h \
     streaming/input/input.h \
+    streaming/input/keyboardmapping.h \
     streaming/session.h \
     streaming/audio/renderers/renderer.h \
     streaming/audio/renderers/sdl.h \

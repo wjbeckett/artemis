@@ -2,6 +2,7 @@
 
 #include <Limelight.h>
 #include "SDL_compat.h"
+#include "keyboardmapping.h"
 
 #define VK_0 0x30
 #define VK_A 0x41
@@ -211,6 +212,17 @@ void SdlInputHandler::handleKeyEvent(SDL_KeyboardEvent* event)
             }
         }
     }
+
+#ifdef Q_OS_MACOS
+    // Keep Artemis's own shortcuts in client key space. Only remap the copy
+    // sent to the host, while system shortcuts are captured by this window.
+    SDL_KeyboardEvent remappedEvent;
+    if (!m_ModifierMapping.isIdentity() && isSystemKeyCaptureActive()) {
+        remappedEvent = *event;
+        remapModifiers(remappedEvent.keysym, m_ModifierMapping);
+        event = &remappedEvent;
+    }
+#endif
 
     // Set modifier flags
     modifiers = 0;

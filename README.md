@@ -97,6 +97,14 @@ Artemis Qt is specifically optimized for handheld gaming devices like the Steam 
 
 > **Note:** The Quick Menu provides easy access to clipboard sync, server commands, and other streaming controls during your session.
 
+### macOS Modifier Mapping
+
+In **Settings → Input Settings**, choose what **Control**, **Option**, and **Command** send to a Windows or Linux host: Ctrl, Alt, or Windows/Super. The default preserves the original mapping. Presets restore the default, swap Command/Control, or send **Control → Ctrl, Option → Windows/Super, Command → Alt**. The last preset gives Control+C/V for copy/paste, Option+V for Windows clipboard history, Option+Shift+S for Windows screenshots, and Command+Tab for host Alt+Tab.
+
+Each host modifier is assigned once. Choosing a target already in use trades the two assignments. Left/right keys remain distinct. Changes take effect on the next stream.
+
+Enable **Capture system keyboard shortcuts** too; choose **always** for windowed streams. Mapping applies only while the stream has keyboard capture. Artemis's own shortcuts are matched before remapping. macOS modifier-key settings apply first: restore the keyboard's physical Control/Option/Command assignments if you want the preset to match those physical labels. Other Mac apps keep their existing behavior. Earlier swap-only preferences are migrated automatically.
+
 ## 📥 Downloads
 All downloads are available in [Releases](https://github.com/wjbeckett/artemis/releases) 
 

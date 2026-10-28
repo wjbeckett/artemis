@@ -13,6 +13,7 @@ SdlInputHandler::SdlInputHandler(StreamingPreferences& prefs, int streamWidth, i
     : m_MultiController(prefs.multiController),
       m_GamepadMouse(prefs.gamepadMouse),
       m_SwapMouseButtons(prefs.swapMouseButtons),
+      m_ModifierMapping(prefs.modifierMapping),
       m_ReverseScrollDirection(prefs.reverseScrollDirection),
       m_SwapFaceButtons(prefs.swapFaceButtons),
       m_MouseWasInVideoRegion(false),
@@ -338,6 +339,14 @@ void SdlInputHandler::updateKeyboardGrabState()
     SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, shouldGrab ? "1" : "0");
 
 #if SDL_VERSION_ATLEAST(2, 0, 15)
+#ifdef Q_OS_MACOS
+    // Changing capture changes whether modifiers are remapped. Release
+    // keys using their old host codes before changing the keyboard grab.
+    if (!m_ModifierMapping.isIdentity() && ((windowFlags & SDL_WINDOW_KEYBOARD_GRABBED) != 0) != shouldGrab) {
+        raiseAllKeys();
+    }
+#endif
+
     // On SDL 2.0.15+, we can get keyboard-only grab on Win32, X11, and Wayland.
     // SDL 2.0.18 adds keyboard grab on macOS (if built with non-AppStore APIs).
     SDL_SetWindowKeyboardGrab(m_Window, shouldGrab ? SDL_TRUE : SDL_FALSE);

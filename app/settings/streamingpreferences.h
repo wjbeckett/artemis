@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QRect>
 #include <QQmlEngine>
+#include "modifiermapping.h"
 
 class StreamingPreferences : public QObject
 {
@@ -147,6 +148,9 @@ public:
     Q_PROPERTY(WindowMode recommendedFullScreenMode MEMBER recommendedFullScreenMode CONSTANT)
     Q_PROPERTY(UIDisplayMode uiDisplayMode MEMBER uiDisplayMode NOTIFY uiDisplayModeChanged)
     Q_PROPERTY(bool swapMouseButtons MEMBER swapMouseButtons NOTIFY mouseButtonsChanged)
+    Q_PROPERTY(int controlModifier READ controlModifier WRITE setControlModifier NOTIFY modifierMappingChanged)
+    Q_PROPERTY(int optionModifier READ optionModifier WRITE setOptionModifier NOTIFY modifierMappingChanged)
+    Q_PROPERTY(int commandModifier READ commandModifier WRITE setCommandModifier NOTIFY modifierMappingChanged)
     Q_PROPERTY(bool muteOnFocusLoss MEMBER muteOnFocusLoss NOTIFY muteOnFocusLossChanged)
     Q_PROPERTY(bool backgroundGamepad MEMBER backgroundGamepad NOTIFY backgroundGamepadChanged)
     Q_PROPERTY(bool reverseScrollDirection MEMBER reverseScrollDirection NOTIFY reverseScrollDirectionChanged)
@@ -188,6 +192,14 @@ public:
     bool detectNetworkBlocking;
     bool showPerformanceOverlay;
     bool swapMouseButtons;
+    ModifierMapping modifierMapping;
+    int controlModifier() const { return modifierMapping.targets[ModifierMapping::Control]; }
+    int optionModifier() const { return modifierMapping.targets[ModifierMapping::Alt]; }
+    int commandModifier() const { return modifierMapping.targets[ModifierMapping::Meta]; }
+    void setControlModifier(int target);
+    void setOptionModifier(int target);
+    void setCommandModifier(int target);
+    Q_INVOKABLE void setModifierPreset(int preset);
     bool muteOnFocusLoss;
     bool backgroundGamepad;
     bool reverseScrollDirection;
@@ -242,6 +254,7 @@ signals:
     void detectNetworkBlockingChanged();
     void showPerformanceOverlayChanged();
     void mouseButtonsChanged();
+    void modifierMappingChanged();
     void muteOnFocusLossChanged();
     void backgroundGamepadChanged();
     void reverseScrollDirectionChanged();
